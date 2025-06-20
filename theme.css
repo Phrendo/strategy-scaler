@@ -1,0 +1,161 @@
+/* Trading Strategy Scaling Calculator - Matrix Theme */
+:root {
+    --bg-primary: #000000;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1a1a1a;
+    --accent-primary: #00ff41;
+    --accent-secondary: #00cc33;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-muted: #888888;
+    --border-color: #333333;
+    --error-color: #ff4444;
+    --success-color: #00ff41;
+}
+
+/* Main app background */
+.stApp {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Main content area */
+.main .block-container {
+    background-color: var(--bg-primary) !important;
+    padding-top: 2rem !important;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--accent-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Text elements */
+p, div, span, label {
+    color: var(--text-primary) !important;
+}
+
+/* Input fields */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea > div > div > textarea {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 4px !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 1px var(--accent-primary) !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--accent-primary) !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton > button:hover {
+    background-color: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Metrics */
+.metric-container {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin: 0.5rem 0 !important;
+}
+
+/* Data frames */
+.stDataFrame {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Selectbox */
+.stSelectbox > div > div {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* File uploader */
+.stFileUploader > div {
+    background-color: var(--bg-tertiary) !important;
+    border: 2px dashed var(--border-color) !important;
+    border-radius: 8px !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: var(--bg-secondary) !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+/* Columns */
+.element-container {
+    background-color: transparent !important;
+}
+
+/* Success/Error messages */
+.stSuccess {
+    background-color: var(--success-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.stError {
+    background-color: var(--error-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Plotly chart containers */
+.js-plotly-plot {
+    background-color: var(--bg-primary) !important;
+}
+
+/* Custom metric styling */
+.custom-metric {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.custom-metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent-primary);
+}
+
+.custom-metric-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
