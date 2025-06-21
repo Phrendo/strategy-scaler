@@ -182,31 +182,15 @@ def main():
     
     # Sidebar for inputs
     with st.sidebar:
-        st.header("⚙️ Configuration")
-        
-        # Data input section
-        st.subheader("📁 Data Input")
-
         # Data input
         csv_input = st.text_area(
             "Paste Data (CSV or Tab-Delimited)",
             height=200,
-            placeholder="Date,PnL\n2024-01-01,1.50\n2024-01-02,-2.30\n\nOr tab-delimited from Excel/SSMS:\nDate\tPnL\n2024-01-01\t1.50\n2024-01-02\t-2.30\n\nPress Enter after pasting to auto-calculate!",
+            placeholder="Date,PnL\n2024-01-01,1.50\n2024-01-02,-2.30\n\nOr tab-delimited from Excel/SSMS:\nDate\tPnL\n2024-01-01\t1.50\n2024-01-02\t-2.30",
             key="csv_input",
-            help="Supports CSV, tab-delimited (Excel), or semicolon-delimited data. Just copy and paste from Excel, SSMS, or any spreadsheet! Press Enter to auto-calculate."
+            help="Supports CSV, tab-delimited (Excel), or semicolon-delimited data. Just copy and paste from Excel, SSMS, or any spreadsheet!"
         )
 
-        # Sample data button (moved below input field)
-        if st.button("🔄 Load Sample Data", help="Load the provided sample data for testing"):
-            sample_data = load_sample_data()
-            if sample_data:
-                st.session_state.sample_data_loaded = sample_data
-                st.success("Sample data loaded! It will be used for calculation.")
-                # Auto-trigger calculation when sample data is loaded
-                st.session_state.trigger_calculation = True
-        
-        # Calculation parameters
-        st.subheader("💰 Parameters")
         starting_capital = st.number_input(
             "Starting Capital ($)",
             min_value=1.0,
@@ -214,7 +198,7 @@ def main():
             step=10.0,
             format="%.2f"
         )
-        
+
         risk_percentage = st.number_input(
             "Risk Percentage (%)",
             min_value=0.1,
@@ -224,28 +208,44 @@ def main():
             format="%.1f"
         ) / 100  # Convert to decimal
 
-        # Determine which data to use
+        # Use the data from the text area
         data_to_use = csv_input
-        if st.session_state.sample_data_loaded:
-            data_to_use = st.session_state.sample_data_loaded
-            st.session_state.sample_data_loaded = None  # Clear after using
 
-        # Auto-calculation logic: detect when data changes
-        auto_calculate = False
-        if data_to_use.strip() and data_to_use != st.session_state.get('last_csv_input', ''):
-            st.session_state.last_csv_input = data_to_use
-            auto_calculate = True
-
-        # Check for manual trigger (from sample data button)
-        if st.session_state.get('trigger_calculation', False):
-            auto_calculate = True
-            st.session_state.trigger_calculation = False
+        # Show data status
+        if data_to_use.strip():
+            lines_count = len([line for line in data_to_use.strip().split('\n') if line.strip()])
+            st.info(f"📊 Data ready: {lines_count} lines detected")
+        else:
+            st.warning("📝 No data entered yet")
 
         # Calculate button
-        calculate_button = st.button("🚀 Calculate Scaling", type="primary")
+        calculate_button = st.button("🚀 Run", type="primary")
+
+        # Clear data button
+        if st.button("🗑️ Clear Data", help="Clear all data and reset the calculator"):
+            # Clear all data-related session state
+            st.session_state.csv_input = ""
+            st.session_state.last_csv_input = ""
+            st.session_state.data_loaded = False
+            st.session_state.calculations_done = False
+            st.session_state.sample_data_loaded = None
+            st.session_state.trigger_calculation = False
+            # Reset calculator
+            st.session_state.calculator = StrategyCalculator()
+            st.success("Data cleared!")
+            st.rerun()
+
+        # Sample data button (moved to bottom)
+        if st.button("🔄 Load Sample Data", help="Load the provided sample data for testing"):
+            sample_data = load_sample_data()
+            if sample_data:
+                # Clear any existing data and load sample data into the text area
+                st.session_state.csv_input = sample_data
+                st.success("Sample data loaded into text area!")
+                st.rerun()
 
         # Determine if we should calculate
-        should_calculate = calculate_button or auto_calculate
+        should_calculate = calculate_button
     
     # Main content area
     if should_calculate and data_to_use.strip():
@@ -380,7 +380,7 @@ def main():
     
     elif not st.session_state.data_loaded:
         # Welcome message
-        st.info("👋 Welcome! Please paste your CSV data in the sidebar - it will auto-calculate when you press Enter!")
+        st.info("👋 Welcome! Please paste your CSV data in the sidebar and click Run!")
 
         # Instructions
         st.subheader("📖 How to Use")
@@ -390,16 +390,16 @@ def main():
            - **Excel**: Select your data and copy (Ctrl+C)
            - **SSMS**: Copy query results directly
            - **CSV files**: Copy the content
-        3. **Paste data**: Paste into the text area in the sidebar and **press Enter** - it will auto-calculate!
+        3. **Paste data**: Paste into the text area in the sidebar
         4. **Set parameters**: Configure your starting capital and risk percentage (optional - defaults work great)
-        5. **Auto-calculation**: The app automatically processes your data when you paste and press Enter
+        5. **Click Run**: Process your data and view the results
         6. **Analyze**: Review the performance metrics and visualizations
 
         **Sample Data**: Click 'Load Sample Data' to try the calculator with provided example data.
 
-        **Supported Formats**: CSV, Tab-delimited (Excel), Semicolon-delimited - the app auto-detects the format!
+        **Clear Data**: Click 'Clear Data' to reset everything and start fresh.
 
-        **💡 Pro Tip**: Just paste your data and press Enter - no need to click buttons!
+        **Supported Formats**: CSV, Tab-delimited (Excel), Semicolon-delimited - the app auto-detects the format!
         """)
 
 if __name__ == "__main__":

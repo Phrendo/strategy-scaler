@@ -40,21 +40,156 @@ A comprehensive web application built with Streamlit that calculates the perform
 
 ### Installation
 1. Clone or download the project
-2. Run the setup:
+2. Set up the environment:
    ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
+   python3 -m venv .venv
+   source .venv/bin/activate
    pip install -r requirements.txt
    ```
 
 ### Running the Application
-- **Easy Start**: Double-click `run_app.bat`
-- **Manual Start**: 
-  ```bash
-  .venv\Scripts\activate
-  streamlit run app.py
-  ```
-- **Testing**: Double-click `run_test.bat` or run `python test_calculator.py`
+
+#### Development Mode
+```bash
+source .venv/bin/activate
+streamlit run app.py
+```
+
+#### Production Deployment (Ubuntu with nginx)
+
+1. **Install system dependencies:**
+   ```bash
+   sudo apt update
+   sudo apt install python3-venv python3-pip nginx
+   ```
+
+2. **Create a systemd service** (`/etc/systemd/system/strategy-scaler.service`):
+   ```ini
+   [Unit]
+   Description=Trading Strategy Scaling Calculator
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=www-data
+   WorkingDirectory=/path/to/strategy-scaler
+   Environment=PATH=/path/to/strategy-scaler/.venv/bin
+   ExecStart=/path/to/strategy-scaler/.venv/bin/streamlit run app.py --server.port=8501 --server.address=127.0.0.1
+   Restart=always
+   RestartSec=3
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   **Note:** Replace `/path/to/strategy-scaler` with the actual path to your application directory.
+
+3. **Configure nginx** (`/etc/nginx/sites-available/strategy-scaler`):
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com;  # Replace with your domain
+
+       location / {
+           proxy_pass http://127.0.0.1:8501;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection "upgrade";
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+4. **Configure firewall (if enabled):**
+   ```bash
+   sudo ufw allow 'Nginx Full'
+   sudo ufw allow ssh
+   sudo ufw --force enable
+   ```
+
+5. **Enable and start services:**
+   ```bash
+   # Enable nginx site
+   sudo ln -s /etc/nginx/sites-available/strategy-scaler /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl reload nginx
+
+   # Enable and start the application
+   sudo systemctl enable strategy-scaler
+   sudo systemctl start strategy-scaler
+   sudo systemctl status strategy-scaler
+   ```
+
+#### Service Management
+```bash
+# Check status
+sudo systemctl status strategy-scaler
+
+# View logs
+sudo journalctl -u strategy-scaler -f
+
+# Restart service
+sudo systemctl restart strategy-scaler
+
+# Stop service
+sudo systemctl stop strategy-scaler
+```
+
+#### SSL/HTTPS Configuration (Recommended for Production)
+
+For production deployments, configure SSL using Let's Encrypt:
+
+1. **Install Certbot:**
+   ```bash
+   sudo apt install certbot python3-certbot-nginx
+   ```
+
+2. **Obtain SSL certificate:**
+   ```bash
+   sudo certbot --nginx -d your-domain.com
+   ```
+
+3. **Auto-renewal:**
+   ```bash
+   sudo crontab -e
+   # Add this line:
+   0 12 * * * /usr/bin/certbot renew --quiet
+   ```
+
+The nginx configuration will be automatically updated to redirect HTTP to HTTPS.
+
+#### Troubleshooting
+
+**Service won't start:**
+```bash
+# Check service logs
+sudo journalctl -u strategy-scaler -n 50
+
+# Check if port is in use
+sudo netstat -tlnp | grep :8501
+
+# Verify virtual environment
+ls -la /path/to/strategy-scaler/.venv/bin/
+```
+
+**nginx errors:**
+```bash
+# Test nginx configuration
+sudo nginx -t
+
+# Check nginx logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+**Permission issues:**
+```bash
+# Ensure correct ownership
+sudo chown -R www-data:www-data /path/to/strategy-scaler
+```
 
 ## How to Use
 
@@ -105,9 +240,6 @@ Updated Capital = Previous Capital + Daily P&L
 ├── visualizations.py      # Chart generation and theming
 ├── theme.css             # Matrix theme styling
 ├── requirements.txt      # Python dependencies
-├── test_calculator.py    # Test suite
-├── run_app.bat          # Easy app launcher
-├── run_test.bat         # Easy test runner
 ├── design/              # Design documents and sample data
 │   ├── new_design.md
 │   ├── SOURCE_DATA_EXAMPLE.csv
@@ -139,7 +271,11 @@ The application includes comprehensive tests:
 - **Edge Cases**: Handles invalid data gracefully
 - **Calculation Accuracy**: Validates against expected results
 
-Run tests with: `python test_calculator.py`
+Run tests with:
+```bash
+source .venv/bin/activate
+python test_calculator.py
+```
 
 ## Dependencies
 
